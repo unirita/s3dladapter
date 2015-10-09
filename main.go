@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"os"
 
+	"s3dladapter/config"
 	"s3dladapter/console"
+	"s3dladapter/download"
 )
 
 // 実行時引数のオプション
@@ -50,10 +52,15 @@ func realMain(args *arguments) int {
 	}
 
 	//TODO:　設定ファイル読み込み
+	conf := config.Config{
+		AccessKeyId:      "<AWS_ACCESS_KEY_ID>",
+		SecletAccessKey:  "<AWS_SECRET_ACCESS_KEY>",
+		Region:           "ap-northeast-1",
+		DownloadLocation: "C:\\TEST",
+	}
 
-	//TODO: S3接続
-
-	//TODO: ファイルダウンロード
+	//設定ファイルを読み込んだ情報でS3に接続してダウンロード
+	download.Download(conf, args.bucketName, args.fileName)
 
 	rc := rc_OK
 	return rc
