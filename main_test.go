@@ -5,6 +5,7 @@ import (
 	"strings"
 	"testing"
 
+	"s3dladapter/console"
 	"s3dladapter/testutil"
 )
 
@@ -48,9 +49,57 @@ func TestRealMain_バージョン出力オプションが指定された場合(t
 }
 
 func TestRealMain_引数に何も指定されなかった場合(t *testing.T) {
+	c := testutil.NewStdoutCapturer()
 
+	args := new(arguments)
+
+	c.Start()
+	rc := realMain(args)
+	out := c.Stop()
+
+	if rc != rc_OK {
+		t.Errorf("想定外のrc[%d]が返された。", rc)
+	}
+	if !strings.Contains(out, console.USAGE) {
+		t.Error("出力内容が想定と違っている。")
+		t.Logf("出力: %s", out)
+	}
 }
 
-func TestRealMain_引数が指定された場合(t *testing.T) {
+func TestRealMain_引数がバケットのみの場合(t *testing.T) {
+	c := testutil.NewStdoutCapturer()
 
+	args := new(arguments)
+	args.bucketName = "bucket"
+
+	c.Start()
+	rc := realMain(args)
+	out := c.Stop()
+
+	if rc != rc_ERROR {
+		t.Errorf("想定外のrc[%d]が返された。", rc)
+	}
+	if !strings.Contains(out, "INVALID ARGUMENT.") {
+		t.Error("出力内容が想定と違っている。")
+		t.Logf("出力: %s", out)
+	}
+}
+
+func TestRealMain_引数がダウンロードファイルのみの場合(t *testing.T) {
+	c := testutil.NewStdoutCapturer()
+
+	args := new(arguments)
+	args.fileName = "file"
+
+	c.Start()
+	rc := realMain(args)
+	out := c.Stop()
+
+	if rc != rc_ERROR {
+		t.Errorf("想定外のrc[%d]が返された。", rc)
+	}
+	if !strings.Contains(out, "INVALID ARGUMENT.") {
+		t.Error("出力内容が想定と違っている。")
+		t.Logf("出力: %s", out)
+	}
 }

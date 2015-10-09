@@ -39,6 +39,22 @@ func realMain(args *arguments) int {
 		return rc_OK
 	}
 
+	if args.versionFlag == flag_OFF && args.bucketName == "" && args.fileName == "" {
+		showUsage()
+		return rc_OK
+	}
+
+	if args.bucketName == "" || args.fileName == "" {
+		console.Display("ARG001E")
+		return rc_ERROR
+	}
+
+	//TODO:　設定ファイル読み込み
+
+	//TODO: S3接続
+
+	//TODO: ファイルダウンロード
+
 	rc := rc_OK
 	return rc
 }
@@ -61,6 +77,5 @@ func showVersion() {
 
 // オンラインヘルプを表示する。
 func showUsage() {
-	console.Display("CTM003E")
 	fmt.Print(console.USAGE)
 }

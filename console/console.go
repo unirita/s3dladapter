@@ -1,3 +1,6 @@
+// Copyright 2015 unirita Inc.
+// Created 2015/10/09 kazami
+
 package console
 
 import (
@@ -9,10 +12,10 @@ const USAGE = `Usage :
     s3dladapter.exe [-v] [-b Bucket] [-f File]
 Option :
     -v                   :   Print s3dladapter version.
-	-b bucket name       :   Designate a buket name.
+    -b bucket name       :   Designate a buket name.
     -f downloadFile name :   Designate a file name.(Without extensions.)
 	
-	-b, -f, is a required input.
+    -b, -f, is a required input.
 Copyright 2015 unirita Inc.
 `
 

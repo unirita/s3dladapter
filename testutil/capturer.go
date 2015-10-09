@@ -1,5 +1,5 @@
 // Copyright 2015 unirita Inc.
-// Created 2015/10/8 kazami
+// Created 2015/10/9 kazami
 
 package testutil
 
