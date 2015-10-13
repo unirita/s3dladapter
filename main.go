@@ -15,6 +15,7 @@ type arguments struct {
 	versionFlag bool   // バージョン情報表示フラグ
 	bucketName  string //バケット名
 	fileName    string //S3からダウンロードするファイル名
+	configPath  string //設定ファイルのパス
 }
 
 //バッチプログラムの戻り値
@@ -52,15 +53,18 @@ func realMain(args *arguments) int {
 	}
 
 	//TODO:　設定ファイル読み込み
-	conf := config.Config{
-		AccessKeyId:      "<AWS_ACCESS_KEY_ID>",
-		SecletAccessKey:  "<AWS_SECRET_ACCESS_KEY>",
-		Region:           "ap-northeast-1",
-		DownloadLocation: "C:\\TEST",
+	if err := config.Load(args.configPath); err != nil {
+		console.Display("CON001E")
+		return rc_ERROR
+	}
+
+	if err := config.DetectError(); err != nil {
+		console.Display("CON002E", err)
+		return rc_ERROR
 	}
 
 	//設定ファイルを読み込んだ情報でS3に接続してダウンロード
-	download.Download(conf, args.bucketName, args.fileName)
+	download.Download(args.bucketName, args.fileName)
 
 	rc := rc_OK
 	return rc
@@ -73,6 +77,7 @@ func fetchArgs() *arguments {
 	flag.BoolVar(&args.versionFlag, "v", false, "version option")
 	flag.StringVar(&args.bucketName, "b", "", "Designate bucket option")
 	flag.StringVar(&args.fileName, "f", "", "Designate download file option")
+	flag.StringVar(&args.configPath, "c", "s3dladapter.ini", "Designate config file option")
 	flag.Parse()
 	return args
 }

@@ -19,11 +19,13 @@ Option :
 Copyright 2015 unirita Inc.
 `
 
-var stack_msg = []string{"ARG001E"}
+var stack_msg = []string{"ARG001E", "CON001E", "CON002E"}
 
 // コンソールメッセージ一覧
 var msgs = map[string]string{
 	"ARG001E": "INVALID ARGUMENT.",
+	"CON001E": "FAILED TO READ CONFIG FILE.",
+	"CON002E": "CONFIG PARM IS NOT EXACT FORMAT.",
 }
 
 // 標準出力へメッセージコードcodeに対応したメッセージを表示する。

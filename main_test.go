@@ -12,7 +12,7 @@ import (
 var testDataDir string
 
 func TestFetchArgs_コマンドラインオプションを取得できる(t *testing.T) {
-	os.Args = append(os.Args, "-v", "-b", "bucket", "-f", "file")
+	os.Args = append(os.Args, "-v", "-b", "bucket", "-f", "file", "-c", "test.ini")
 	args := fetchArgs()
 
 	if args.versionFlag != flag_ON {
@@ -25,6 +25,10 @@ func TestFetchArgs_コマンドラインオプションを取得できる(t *tes
 
 	if args.fileName != "file" {
 		t.Error("-fオプションの指定を検出できなかった。")
+	}
+
+	if args.configPath != "test.ini" {
+		t.Error("-cオプションの指定を検出できなかった。")
 	}
 
 }
@@ -99,6 +103,48 @@ func TestRealMain_引数がダウンロードファイルのみの場合(t *test
 		t.Errorf("想定外のrc[%d]が返された。", rc)
 	}
 	if !strings.Contains(out, "INVALID ARGUMENT.") {
+		t.Error("出力内容が想定と違っている。")
+		t.Logf("出力: %s", out)
+	}
+}
+
+func TestRealMain_存在しない設定ファイルが指定された場合(t *testing.T) {
+	c := testutil.NewStdoutCapturer()
+
+	args := new(arguments)
+	args.bucketName = "testbucket"
+	args.fileName = "testfile"
+	args.configPath = "noexists.ini"
+
+	c.Start()
+	rc := realMain(args)
+	out := c.Stop()
+
+	if rc != rc_ERROR {
+		t.Errorf("想定外のrc[%d]が返された。", rc)
+	}
+	if !strings.Contains(out, "FAILED TO READ CONFIG FILE.") {
+		t.Error("出力内容が想定と違っている。")
+		t.Logf("出力: %s", out)
+	}
+}
+
+func TestRealMain_不正な内容の設定ファイルが指定された場合(t *testing.T) {
+	c := testutil.NewStdoutCapturer()
+
+	args := new(arguments)
+	args.bucketName = "testbucket"
+	args.fileName = "testfile"
+	args.configPath = "configerror.ini"
+
+	c.Start()
+	rc := realMain(args)
+	out := c.Stop()
+
+	if rc != rc_ERROR {
+		t.Errorf("想定外のrc[%d]が返された。", rc)
+	}
+	if !strings.Contains(out, "CONFIG PARM IS NOT EXACT FORMAT.") {
 		t.Error("出力内容が想定と違っている。")
 		t.Logf("出力: %s", out)
 	}
