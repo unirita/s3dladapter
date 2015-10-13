@@ -24,36 +24,40 @@ type downloader struct {
 	dir    string
 }
 
-//os.Getenv()
-
-func Download(bucket string, file string) {
-	//TODO: 設定ファイルの情報を与えてS3のインスタンスを作成する
+func Download(bucketName string, fileName string) error {
+	//設定ファイルの情報を与えてS3のインスタンスを作成する
 	cred := credentials.NewStaticCredentials(config.Aws.AccessKeyId, config.Aws.SecletAccessKey, "")
 	awsConf := aws.Config{Credentials: cred, Region: &config.Aws.Region}
 	client := s3.New(&awsConf)
 
-	params := &s3.ListObjectsInput{Bucket: &bucket, Prefix: &file}
+	params := &s3.ListObjectsInput{Bucket: &bucketName, Prefix: &fileName}
 
 	manager := s3manager.NewDownloader(nil)
-	d := downloader{bucket: bucket, file: file, dir: config.Download.DownloadDir, Downloader: manager}
+	d := downloader{bucket: bucketName, file: fileName, dir: config.Download.DownloadDir, Downloader: manager}
 
-	client.ListObjectsPages(params, d.eachPage)
+	resp, _ := client.ListObjects(params)
+	if len(resp.Contents) == 0 {
+		return fmt.Errorf("Not Exist download file.")
+	}
+
+	if err := d.eachPage(resp); err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func (d *downloader) eachPage(page *s3.ListObjectsOutput, more bool) bool {
-	for _, obj := range page.Contents {
+func (d *downloader) eachPage(resp *s3.ListObjectsOutput) error {
+	for _, obj := range resp.Contents {
 		d.downloadToFile(*obj.Key)
 	}
 
-	return true
+	return nil
 }
 
-func (d *downloader) downloadToFile(key string) {
+func (d *downloader) downloadToFile(key string) error {
 	// Create the directories in the path
 	file := filepath.Join(d.dir, key)
-	if err := os.MkdirAll(filepath.Dir(file), 0775); err != nil {
-		panic(err)
-	}
 
 	// Setup the local file
 	fd, err := os.Create(file)
@@ -65,7 +69,9 @@ func (d *downloader) downloadToFile(key string) {
 	// Download the file using the AWS SDK
 	fmt.Printf("Downloading s3://%s/%s to %s...\n", d.bucket, key, file)
 	params := &s3.GetObjectInput{Bucket: &d.bucket, Key: &key}
-	d.Download(fd, params)
+	if _, err := d.Download(fd, params); err != nil {
+		return fmt.Errorf("Failed download file %s", file)
+	}
 
-	return
+	return nil
 }

@@ -149,3 +149,23 @@ func TestRealMain_不正な内容の設定ファイルが指定された場合(t
 		t.Logf("出力: %s", out)
 	}
 }
+
+func TestRealMain_s3にダウンロードファイルが無い場合(t *testing.T) {
+	c := testutil.NewStdoutCapturer()
+
+	args := new(arguments)
+	args.bucketName = "testbucket"
+	args.fileName = "testfile"
+
+	c.Start()
+	rc := realMain(args)
+	out := c.Stop()
+
+	if rc != rc_ERROR {
+		t.Errorf("想定外のrc[%d]が返された。", rc)
+	}
+	if !strings.Contains(out, "DOWNLOAD FAILED.") {
+		t.Error("出力内容が想定と違っている。")
+		t.Logf("出力: %s", out)
+	}
+}

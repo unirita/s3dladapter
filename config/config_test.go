@@ -10,7 +10,6 @@ func generateTestConfig() {
 	Aws.SecletAccessKey = `seclettestkey`
 	Aws.Region = `ap-northeast-1`
 	Download.DownloadDir = `c:\TEST`
-
 }
 
 func TestLoad_存在しないファイルをロードしようとした場合はエラー(t *testing.T) {

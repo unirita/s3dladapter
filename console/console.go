@@ -26,6 +26,7 @@ var msgs = map[string]string{
 	"ARG001E": "INVALID ARGUMENT.",
 	"CON001E": "FAILED TO READ CONFIG FILE.",
 	"CON002E": "CONFIG PARM IS NOT EXACT FORMAT.",
+	"DOW001E": "DOWNLOAD FAILED.",
 }
 
 // 標準出力へメッセージコードcodeに対応したメッセージを表示する。
