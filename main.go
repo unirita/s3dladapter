@@ -30,6 +30,8 @@ const (
 	flag_OFF = false
 )
 
+const defaultConfig = `s3dladapter.ini`
+
 func main() {
 	args := fetchArgs()
 	rc := realMain(args)
@@ -52,14 +54,17 @@ func realMain(args *arguments) int {
 		return rc_ERROR
 	}
 
-	//設定ファイル読み込み
+	if args.configPath == "" {
+		args.configPath = defaultConfig
+	}
+
 	if err := config.Load(args.configPath); err != nil {
-		console.Display("CON001E")
+		console.Display("CON001E", err)
 		return rc_ERROR
 	}
 
 	if err := config.DetectError(); err != nil {
-		console.Display("CON002E")
+		console.Display("CON002E", err)
 		return rc_ERROR
 	}
 
@@ -77,7 +82,7 @@ func fetchArgs() *arguments {
 	flag.BoolVar(&args.versionFlag, "v", false, "version option")
 	flag.StringVar(&args.bucketName, "b", "", "Designate bucket option")
 	flag.StringVar(&args.fileName, "f", "", "Designate download file option")
-	flag.StringVar(&args.configPath, "c", "s3dladapter.ini", "Designate config file option")
+	flag.StringVar(&args.configPath, "c", "", "Designate config file option")
 	flag.Parse()
 	return args
 }

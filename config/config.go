@@ -22,7 +22,7 @@ type config struct {
 type awsTable struct {
 	AccessKeyId     string `toml:"access_key_id"`
 	SecletAccessKey string `toml:"secret_access_key"`
-	Region          string `toml:"region`
+	Region          string `toml:"region"`
 }
 
 // 設定ファイルのdownloadテーブル

@@ -26,16 +26,16 @@ type downloader struct {
 
 //os.Getenv()
 
-func Download(conf config.Config, bucket string, file string) {
+func Download(bucket string, file string) {
 	//TODO: 設定ファイルの情報を与えてS3のインスタンスを作成する
-	cred := credentials.NewStaticCredentials(conf.AccessKeyId, conf.SecletAccessKey, "")
-	awsConf := aws.Config{Credentials: cred, Region: &conf.Region}
+	cred := credentials.NewStaticCredentials(config.Aws.AccessKeyId, config.Aws.SecletAccessKey, "")
+	awsConf := aws.Config{Credentials: cred, Region: &config.Aws.Region}
 	client := s3.New(&awsConf)
 
 	params := &s3.ListObjectsInput{Bucket: &bucket, Prefix: &file}
 
 	manager := s3manager.NewDownloader(nil)
-	d := downloader{bucket: bucket, file: file, dir: conf.DownloadLocation, Downloader: manager}
+	d := downloader{bucket: bucket, file: file, dir: config.Download.DownloadDir, Downloader: manager}
 
 	client.ListObjectsPages(params, d.eachPage)
 }

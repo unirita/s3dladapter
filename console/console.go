@@ -21,8 +21,6 @@ Option :
 Copyright 2015 unirita Inc.
 `
 
-var stack_msg = []string{"ARG001E", "CON001E", "CON002E"}
-
 // コンソールメッセージ一覧
 var msgs = map[string]string{
 	"ARG001E": "INVALID ARGUMENT.",
@@ -37,13 +35,19 @@ var msgs = map[string]string{
 // return : 出力文字数。
 //
 // return : エラー情報。
-func Display(code string) {
-	msg := GetMessage(code)
-	for _, s := range stack_msg {
-		if code == s {
-			fmt.Println(msg)
-		}
-	}
+//func Display(code string) {
+//	msg := GetMessage(code)
+//	for _, s := range stack_msg {
+//		if code == s {
+//			fmt.Println(msg)
+//		}
+//	}
+//}
+
+func Display(code string, a ...interface{}) (int, error) {
+	msg := GetMessage(code, a...)
+
+	return fmt.Println(msg)
 }
 
 // 出力メッセージを文字列型で取得する。
@@ -52,6 +56,10 @@ func Display(code string) {
 //
 //
 // return : 取得したメッセージ
-func GetMessage(code string) string {
-	return fmt.Sprintf("%s", msgs[code])
+//func GetMessage(code string) string {
+//	return fmt.Sprintf("%s", msgs[code])
+//}
+
+func GetMessage(code string, a ...interface{}) string {
+	return fmt.Sprintf("%s %s", code, fmt.Sprintf(msgs[code], a...))
 }

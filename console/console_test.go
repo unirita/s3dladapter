@@ -17,14 +17,14 @@ func TestDisplay_メッセージを出力できる_引数なし(t *testing.T) {
 
 	output := c.Stop()
 
-	if output != "INVALID ARGUMENT.\n" {
+	if output != "ARG001E INVALID ARGUMENT.\n" {
 		t.Errorf("stdoutへの出力値[%s]が想定と違います。", output)
 	}
 }
 
 func TestGetMessage_メッセージを文字列として取得できる_引数なし(t *testing.T) {
 	msg := GetMessage("ARG001E")
-	if msg != "INVALID ARGUMENT." {
+	if msg != "ARG001E INVALID ARGUMENT." {
 		t.Errorf("取得値[%s]が想定と違います。", msg)
 	}
 }
