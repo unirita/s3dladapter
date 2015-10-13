@@ -7,9 +7,9 @@ import (
 )
 
 func generateTestConfig() {
-	config.Aws.AccessKeyId = `AKIAI47YWI4JPYD5XKNA`
-	config.Aws.SecletAccessKey = `mPZn9lBNdrtnoEbIZWV51pjvd2kySrCOgmYBKqji`
-	config.Aws.Region = `ap-northeast-1`
+	config.Aws.AccessKeyId = ``
+	config.Aws.SecletAccessKey = ``
+	config.Aws.Region = ``
 	config.Download.DownloadDir = `c:\TEST`
 }
 
