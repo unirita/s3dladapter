@@ -14,9 +14,9 @@ Option :
     -v                   :   Print s3dladapter version.
     -b bucket name       :   Designate a buket name.
     -f downloadFile name :   Designate a file name.(Without extensions.)
-	-c configFile Path   :   Designate configFile Path.
+    -c configFile Path   :   Designate configFile Path.
 	
-	-c default is same path as the executable file.
+    -c default is same path as the executable file.
     -b, -f, is a required input.
 Copyright 2015 unirita Inc.
 `
