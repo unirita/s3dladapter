@@ -52,14 +52,14 @@ func realMain(args *arguments) int {
 		return rc_ERROR
 	}
 
-	//TODO:　設定ファイル読み込み
+	//設定ファイル読み込み
 	if err := config.Load(args.configPath); err != nil {
 		console.Display("CON001E")
 		return rc_ERROR
 	}
 
 	if err := config.DetectError(); err != nil {
-		console.Display("CON002E", err)
+		console.Display("CON002E")
 		return rc_ERROR
 	}
 
