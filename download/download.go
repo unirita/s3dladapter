@@ -46,14 +46,14 @@ func Download(bucketName string, fileName string) error {
 		return fmt.Errorf("Not Exist download file.")
 	}
 
-	if err := d.eachPage(resp); err != nil {
+	if err := d.eachObjects(resp); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (d *downloader) eachPage(resp *s3.ListObjectsOutput) error {
+func (d *downloader) eachObjects(resp *s3.ListObjectsOutput) error {
 	for _, obj := range resp.Contents {
 		d.downloadToFile(*obj.Key)
 	}
