@@ -6,15 +6,11 @@ import (
 	"s3dladapter/config"
 )
 
-func generateTestConfig() {
-	config.Aws.AccessKeyId = `AKIAI47YWI4JPYD5XKNA`
-	config.Aws.SecletAccessKey = `mPZn9lBNdrtnoEbIZWV51pjvd2kySrCOgmYBKqji`
-	config.Aws.Region = `ap-northeast-1`
-	config.Download.DownloadDir = `c:\TEST`
-}
-
 func TestDownload_S3にダウンロードするファイルが存在する場合はエラーじゃない(t *testing.T) {
-	generateTestConfig()
+	testConfig := `downloadtest.ini`
+	if err := config.Load(testConfig); err != nil {
+		t.Error("テスト用のconfigが存在しない")
+	}
 
 	testBucket := "testbucketuniritanewautomation"
 	testFile := "test1.txt"
@@ -25,7 +21,10 @@ func TestDownload_S3にダウンロードするファイルが存在する場合
 }
 
 func TestDownload_S3にダウンロードするファイルが存在しない場合はエラー(t *testing.T) {
-	generateTestConfig()
+	testConfig := `downloadtest.ini`
+	if err := config.Load(testConfig); err != nil {
+		t.Error("テスト用のconfigが存在しない")
+	}
 
 	testBucket := "noexistBucket"
 	testFile := "noexistFile"

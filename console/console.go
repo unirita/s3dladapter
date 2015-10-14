@@ -36,15 +36,6 @@ var msgs = map[string]string{
 // return : 出力文字数。
 //
 // return : エラー情報。
-//func Display(code string) {
-//	msg := GetMessage(code)
-//	for _, s := range stack_msg {
-//		if code == s {
-//			fmt.Println(msg)
-//		}
-//	}
-//}
-
 func Display(code string, a ...interface{}) (int, error) {
 	msg := GetMessage(code, a...)
 
@@ -60,7 +51,6 @@ func Display(code string, a ...interface{}) (int, error) {
 //func GetMessage(code string) string {
 //	return fmt.Sprintf("%s", msgs[code])
 //}
-
 func GetMessage(code string, a ...interface{}) string {
 	return fmt.Sprintf("%s %s", code, fmt.Sprintf(msgs[code], a...))
 }

@@ -24,6 +24,12 @@ type downloader struct {
 	dir    string
 }
 
+// S3からファイルをダウンロードする
+//
+// 引数: bucketName ダウンロード対象のファイルが入ったバケット名
+//      fileName ダウンロード対象のファイル
+//
+// 戻り値： エラー情報
 func Download(bucketName string, fileName string) error {
 	//設定ファイルの情報を与えてS3のインスタンスを作成する
 	cred := credentials.NewStaticCredentials(config.Aws.AccessKeyId, config.Aws.SecletAccessKey, "")
@@ -56,17 +62,14 @@ func (d *downloader) eachPage(resp *s3.ListObjectsOutput) error {
 }
 
 func (d *downloader) downloadToFile(key string) error {
-	// Create the directories in the path
 	file := filepath.Join(d.dir, key)
 
-	// Setup the local file
 	fd, err := os.Create(file)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	defer fd.Close()
 
-	// Download the file using the AWS SDK
 	fmt.Printf("Downloading s3://%s/%s to %s...\n", d.bucket, key, file)
 	params := &s3.GetObjectInput{Bucket: &d.bucket, Key: &key}
 	if _, err := d.Download(fd, params); err != nil {
