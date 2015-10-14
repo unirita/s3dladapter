@@ -6,16 +6,6 @@ import (
 	"s3dladapter/config"
 )
 
-<<<<<<< HEAD
-=======
-func generateTestConfig() {
-	config.Aws.AccessKeyId = ``
-	config.Aws.SecletAccessKey = ``
-	config.Aws.Region = ``
-	config.Download.DownloadDir = `c:\TEST`
-}
-
->>>>>>> c7749dee8ed85f50a6503549c9a941164558a612
 func TestDownload_S3にダウンロードするファイルが存在する場合はエラーじゃない(t *testing.T) {
 	testConfig := `downloadtest.ini`
 	if err := config.Load(testConfig); err != nil {
