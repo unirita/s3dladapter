@@ -6,25 +6,44 @@ import (
 	"s3dladapter/config"
 )
 
-func TestGetS3Instance_認証情報に該当するアカウントが存在する場合はインスタンスを返す(t *testing.T) {
-	testConfig := "existS3.ini"
-	if err := config.Load(testConfig); err != nil {
-		t.Errorf("テストファイルの読み込みに失敗")
-	}
-
-	if _, err := GetS3Instance(); err != nil {
-		t.Errorf("認証が通っていない")
-	}
-
-}
-
-func TestGetS3Instance_認証情報に該当するアカウントが存在しない場合はエラー(t *testing.T) {
+func TestDownload_認証情報正しくない場合はエラー(t *testing.T) {
 	testConfig := "noexistS3.ini"
 	if err := config.Load(testConfig); err != nil {
 		t.Errorf("テストファイルの読み込みに失敗")
 	}
 
-	if _, err := GetS3Instance(); err == nil {
-		t.Errorf("期待していない認証が通っている")
+	bucket := "testbucketuniritanewautomation"
+	file := "test1.txt"
+
+	if err := Download(bucket, file); err == nil {
+		t.Errorf("期待するエラーが起こっていない")
+	}
+}
+
+func TestDownload_S3に指定したバケット名が存在しない場合はエラー(t *testing.T) {
+	testConfig := "existS3.ini"
+	if err := config.Load(testConfig); err != nil {
+		t.Errorf("テストファイルの読み込みに失敗")
+	}
+
+	bucket := "noexistBucket"
+	file := "test1.txt"
+
+	if err := Download(bucket, file); err == nil {
+		t.Errorf("期待するエラーが起こっていない")
+	}
+}
+
+func TestDownload_S3に指定したキー名のファイルが存在しない場合はエラー(t *testing.T) {
+	testConfig := "existS3.ini"
+	if err := config.Load(testConfig); err != nil {
+		t.Errorf("テストファイルの読み込みに失敗")
+	}
+
+	bucket := "noexistBucket"
+	file := "noexist.txt"
+
+	if err := Download(bucket, file); err == nil {
+		t.Errorf("期待するエラーが起こっていない")
 	}
 }

@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	//"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/defaults"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -44,33 +43,29 @@ func Download(bucketName string, fileName string) error {
 
 	manager := s3manager.NewDownloader(nil)
 	downloadManager := downloader{bucket: bucketName, file: fileName, dir: config.Download.DownloadDir, Downloader: manager}
-	key, err := downloadManager.searchFile(resp)
-	if err != nil {
-		return err
-	}
 
-	if err := downloadManager.downloadToFile(key); err != nil {
+	if err := downloadManager.searchToDownload(resp); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (downloadManager *downloader) searchFile(resp *s3.ListObjectsOutput) (string, error) {
-	var foundKey string
-
+// バケット内の複数オブジェクトから、形式がファイルであるものみにフィルタリングしてダウンロード。
+//
+// 引数: resp S3のキー名に部分一致したオブジェクト（複数）
+//
+// 戻り値： エラー情報
+func (downloadManager *downloader) searchToDownload(resp *s3.ListObjectsOutput) error {
 	for _, content := range resp.Contents {
 		if (*content.Key == downloadManager.file) && (!strings.Contains(*content.Key, "/")) {
-			fmt.Println(*content.Key)
-			foundKey = *content.Key
+			if err := downloadManager.downloadToFile(*content.Key); err != nil {
+				return err
+			}
 		}
 	}
 
-	if foundKey == "" {
-		return "", fmt.Errorf("Specified file not found.")
-	}
-
-	return foundKey, nil
+	return nil
 }
 
 func (downloadManager *downloader) downloadToFile(key string) error {
@@ -89,6 +84,7 @@ func (downloadManager *downloader) downloadToFile(key string) error {
 		return err
 	}
 
+	fmt.Printf("Complete download.")
 	return nil
 }
 
