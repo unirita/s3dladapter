@@ -50,6 +50,7 @@ func realMain(args *arguments) int {
 
 	if strings.HasSuffix(args.fileName, "/") {
 		console.Display("ADP001E")
+		return rc_ERROR
 	}
 
 	if err := config.Load(args.configPath); err != nil {

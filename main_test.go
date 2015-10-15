@@ -127,6 +127,25 @@ func TestRealMain_引数が設定ファイルのみの場合(t *testing.T) {
 	}
 }
 
+func TestRealMain_引数がディレクトリが指定された場合(t *testing.T) {
+	c := testutil.NewStdoutCapturer()
+
+	args := new(arguments)
+	args.fileName = "test/"
+
+	c.Start()
+	rc := realMain(args)
+	out := c.Stop()
+
+	if rc != rc_ERROR {
+		t.Errorf("想定外のrc[%d]が返された。", rc)
+	}
+	if !strings.Contains(out, "DIRECTORY CAN NOT BE SPECIFIED.") {
+		t.Error("出力内容が想定と違っている。")
+		t.Logf("出力: %s", out)
+	}
+}
+
 func TestRealMain_存在しない設定ファイルが指定された場合(t *testing.T) {
 	c := testutil.NewStdoutCapturer()
 

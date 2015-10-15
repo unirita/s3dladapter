@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -42,34 +43,42 @@ func Download(bucketName string, fileName string) error {
 	}
 
 	manager := s3manager.NewDownloader(nil)
-	downloadManager := downloader{bucket: bucketName, file: fileName, dir: config.Download.DownloadDir, Downloader: manager}
+	d := downloader{bucket: bucketName, file: fileName, dir: config.Download.DownloadDir, Downloader: manager}
+	if !existsDownloadFile(fileName, resp) {
+		return fmt.Errorf("Not exists download file.")
+	}
 
-	if err := downloadManager.searchToDownload(resp); err != nil {
+	if err := d.downlowdFile(fileName); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-// バケット内の複数オブジェクトから、形式がファイルであるものみにフィルタリングしてダウンロード。
+// バケット内の複数オブジェクトにダウンロードしたいファイルが存在するか判断。
 //
 // 引数: resp S3のキー名に部分一致したオブジェクト（複数）
 //
-// 戻り値： エラー情報
-func (downloadManager *downloader) searchToDownload(resp *s3.ListObjectsOutput) error {
+// 戻り値： ダウンロードしたいファイルが存在するか　[存在する = true]
+func existsDownloadFile(downloadFile string, resp *s3.ListObjectsOutput) bool {
 	for _, content := range resp.Contents {
-		if *content.Key == downloadManager.file {
-			if err := downloadManager.downloadToFile(*content.Key); err != nil {
-				return err
-			}
+		if *content.Key == downloadFile {
+			return true
 		}
 	}
-
-	return nil
+	return false
 }
 
-func (downloadManager *downloader) downloadToFile(key string) error {
-	file := filepath.Join(downloadManager.dir, key)
+// ファイルをダウンロードする。
+//
+// 引数: ダウンロードするファイル名
+//
+// 戻り値： エラー情報
+func (d *downloader) downlowdFile(key string) error {
+	buffKeys := strings.Split(key, "/")
+
+	fileName := buffKeys[len(buffKeys)-1]
+	file := filepath.Join(d.dir, fileName)
 
 	fs, err := os.Create(file)
 	if err != nil {
@@ -77,10 +86,12 @@ func (downloadManager *downloader) downloadToFile(key string) error {
 	}
 	defer fs.Close()
 
-	fmt.Printf("Downloading s3://%s/%s to %s...\n", downloadManager.bucket, key, file)
-	params := &s3.GetObjectInput{Bucket: &downloadManager.bucket, Key: &key}
-	if totalByte, err := downloadManager.Download(fs, params); err != nil {
-		fmt.Println(totalByte)
+	fmt.Printf("Downloading s3://%s/%s to %s...\n", d.bucket, fileName, file)
+	params := &s3.GetObjectInput{Bucket: &d.bucket, Key: &fileName}
+	if _, err := d.Download(fs, params); err != nil {
+		if err := os.Remove(file); err != nil {
+			return err
+		}
 		return err
 	}
 
