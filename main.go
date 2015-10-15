@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 
 	"s3dladapter/config"
 	"s3dladapter/console"
@@ -47,19 +48,23 @@ func realMain(args *arguments) int {
 		return rc_ERROR
 	}
 
+	if strings.HasSuffix(args.fileName, "/") {
+		console.Display("ADP001E")
+	}
+
 	if err := config.Load(args.configPath); err != nil {
-		console.Display("ADP001E", err)
+		console.Display("ADP002E", err)
 		return rc_ERROR
 	}
 
 	if err := config.DetectError(); err != nil {
-		console.Display("ADP002E", err)
+		console.Display("ADP003E", err)
 		return rc_ERROR
 	}
 
 	//設定ファイルを読み込んだ情報でS3に接続してダウンロード
 	if err := download.Download(args.bucketName, args.fileName); err != nil {
-		console.Display("ADP003E", err)
+		console.Display("ADP004E", err)
 		return rc_ERROR
 	}
 
