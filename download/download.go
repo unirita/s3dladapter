@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
+	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/defaults"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -58,7 +58,7 @@ func Download(bucketName string, fileName string) error {
 // 戻り値： エラー情報
 func (downloadManager *downloader) searchToDownload(resp *s3.ListObjectsOutput) error {
 	for _, content := range resp.Contents {
-		if (*content.Key == downloadManager.file) && (!strings.Contains(*content.Key, "/")) {
+		if *content.Key == downloadManager.file {
 			if err := downloadManager.downloadToFile(*content.Key); err != nil {
 				return err
 			}
@@ -93,5 +93,21 @@ func getS3Instance() *s3.S3 {
 	defaults.DefaultConfig.Credentials = credentials.NewStaticCredentials(config.Aws.AccessKeyId, config.Aws.SecletAccessKey, "")
 	defaults.DefaultConfig.Region = &config.Aws.Region
 
-	return s3.New(nil)
+	conf := aws.NewConfig()
+
+	if config.Log.LogLevel == 0 {
+		conf.WithLogLevel(aws.LogOff)
+	} else if config.Log.LogLevel == 1 {
+		conf.WithLogLevel(aws.LogDebugWithSigning)
+	} else if config.Log.LogLevel == 2 {
+		conf.WithLogLevel(aws.LogDebugWithHTTPBody)
+	} else if config.Log.LogLevel == 3 {
+		conf.WithLogLevel(aws.LogDebugWithRequestRetries)
+	} else if config.Log.LogLevel == 4 {
+		conf.WithLogLevel(aws.LogDebugWithRequestErrors)
+	} else if config.Log.LogLevel == 5 {
+		conf.WithLogLevel(aws.LogDebug)
+	}
+
+	return s3.New(conf)
 }

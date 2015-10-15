@@ -14,6 +14,7 @@ import (
 type config struct {
 	Aws      awsTable
 	Download downloadTable
+	Log      logTable
 }
 
 // 設定ファイルのawsテーブル
@@ -28,8 +29,14 @@ type downloadTable struct {
 	DownloadDir string `toml:"download_dir"`
 }
 
+// 設定ファイルのlogテーブル
+type logTable struct {
+	LogLevel int `toml:"loglevel"`
+}
+
 var Aws = new(awsTable)
 var Download = new(downloadTable)
+var Log = new(logTable)
 
 // 設定ファイルをロードする。
 //
@@ -54,6 +61,8 @@ func loadReader(reader io.Reader) error {
 
 	Aws = &c.Aws
 	Download = &c.Download
+	Log = &c.Log
+
 	return nil
 }
 
@@ -73,15 +82,19 @@ func DetectError() error {
 		return fmt.Errorf("Aws.region value is not set.")
 	}
 
-	if !PathExists(Download.DownloadDir) {
+	if !pathExists(Download.DownloadDir) {
 		return fmt.Errorf("Download.download_dir(%s) does not exist.", Download.DownloadDir)
+	}
+
+	if Log.LogLevel < 0 || Log.LogLevel > 5 {
+		return fmt.Errorf("Log.loglevel (%d) must to be range from 0 to 5", Log.LogLevel)
 	}
 
 	return nil
 }
 
 //パスの存在チェック
-func PathExists(path string) bool {
+func pathExists(path string) bool {
 	_, err := os.Stat(path)
 	return err == nil
 }

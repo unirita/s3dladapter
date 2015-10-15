@@ -10,6 +10,7 @@ func generateTestConfig() {
 	Aws.SecletAccessKey = `seclettestkey`
 	Aws.Region = `ap-northeast-1`
 	Download.DownloadDir = `c:\TEST`
+	Log.LogLevel = 5
 }
 
 func TestLoad_存在しないファイルをロードしようとした場合はエラー(t *testing.T) {
@@ -26,6 +27,8 @@ secret_access_key='seclettestkey'
 region='ap-northeast-1'
 [download]
 download_dir='c:\TEST'
+[log]
+loglevel=5
 `
 
 	r := strings.NewReader(conf)
@@ -57,6 +60,8 @@ seclet_access_key=seclettestkey
 region='ap-northeast-1'
 [download]
 download_dir='c:\TEST'
+[log]
+loglevel=5
 `
 
 	r := strings.NewReader(conf)
@@ -106,15 +111,57 @@ func TestDetectError_ダウンロード保存先パスが存在しなかった�
 	}
 }
 
-func TestPathExists_ローカルパスの存在確認(t *testing.T) {
+func TestDetectError_loglevelの値が最大(t *testing.T) {
+	generateTestConfig()
+	Log.LogLevel = 5
+	if err := DetectError(); err != nil {
+		t.Errorf("期待していないエラーが発生した")
+	}
+
+	if Log.LogLevel != 5 {
+		t.Errorf("loglevelに正しい値が入っていない[%d]", Log.LogLevel)
+	}
+}
+
+func TestDetectError_範囲外の数値の場合はエラー_最大越え(t *testing.T) {
+	generateTestConfig()
+	Log.LogLevel = 6
+	if err := DetectError(); err == nil {
+		t.Errorf("エラーが発生しなかった。")
+	}
+
+}
+
+func TestDetectError_loglevelの値が最小(t *testing.T) {
+	generateTestConfig()
+	Log.LogLevel = 0
+	if err := DetectError(); err != nil {
+		t.Errorf("期待していないエラーが発生した")
+	}
+
+	if Log.LogLevel != 0 {
+		t.Errorf("loglevelに正しい値が入っていない[%d]", Log.LogLevel)
+	}
+}
+
+func TestDetectError_範囲外の数値の場合はエラー_マイナス(t *testing.T) {
+	generateTestConfig()
+	Log.LogLevel = -1
+	if err := DetectError(); err == nil {
+		t.Errorf("エラーが発生しなかった。")
+	}
+
+}
+
+func TestpathExists_ローカルパスの存在確認(t *testing.T) {
 	nonExistPath := "C:\\HOGEHOGEAAABBB"
 	existPath := "C:\\"
 
-	if PathExists(existPath) == false {
+	if pathExists(existPath) == false {
 		t.Errorf("パスのチェックが間違っています")
 	}
 
-	if PathExists(nonExistPath) == true {
+	if pathExists(nonExistPath) == true {
 		t.Errorf("パスのチェックが間違っています")
 	}
 }
