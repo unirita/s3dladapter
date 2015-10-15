@@ -7,9 +7,11 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
-	"github.com/aws/aws-sdk-go/aws"
+	//"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/defaults"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 
@@ -32,49 +34,68 @@ type downloader struct {
 // 戻り値： エラー情報
 func Download(bucketName string, fileName string) error {
 	//設定ファイルの情報を与えてS3のインスタンスを作成する
-	cred := credentials.NewStaticCredentials(config.Aws.AccessKeyId, config.Aws.SecletAccessKey, "")
-	awsConf := aws.Config{Credentials: cred, Region: &config.Aws.Region}
-	client := s3.New(&awsConf)
+	client := getS3Instance()
 
 	params := &s3.ListObjectsInput{Bucket: &bucketName, Prefix: &fileName}
+	resp, connectErr := client.ListObjects(params)
+	if connectErr != nil {
+		return connectErr
+	}
 
 	manager := s3manager.NewDownloader(nil)
-	d := downloader{bucket: bucketName, file: fileName, dir: config.Download.DownloadDir, Downloader: manager}
-
-	resp, _ := client.ListObjects(params)
-	if len(resp.Contents) == 0 {
-		return fmt.Errorf("Not Exist download file.")
-	}
-
-	if err := d.eachObjects(resp); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (d *downloader) eachObjects(resp *s3.ListObjectsOutput) error {
-	for _, obj := range resp.Contents {
-		d.downloadToFile(*obj.Key)
-	}
-
-	return nil
-}
-
-func (d *downloader) downloadToFile(key string) error {
-	file := filepath.Join(d.dir, key)
-
-	fd, err := os.Create(file)
+	downloadManager := downloader{bucket: bucketName, file: fileName, dir: config.Download.DownloadDir, Downloader: manager}
+	key, err := downloadManager.searchFile(resp)
 	if err != nil {
 		return err
 	}
-	defer fd.Close()
 
-	fmt.Printf("Downloading s3://%s/%s to %s...\n", d.bucket, key, file)
-	params := &s3.GetObjectInput{Bucket: &d.bucket, Key: &key}
-	if _, err := d.Download(fd, params); err != nil {
-		return fmt.Errorf("Failed download file %s", file)
+	if err := downloadManager.downloadToFile(key); err != nil {
+		return err
 	}
 
 	return nil
+}
+
+func (downloadManager *downloader) searchFile(resp *s3.ListObjectsOutput) (string, error) {
+	var foundKey string
+
+	for _, content := range resp.Contents {
+		if (*content.Key == downloadManager.file) && (!strings.Contains(*content.Key, "/")) {
+			fmt.Println(*content.Key)
+			foundKey = *content.Key
+		}
+	}
+
+	if foundKey == "" {
+		return "", fmt.Errorf("Specified file not found.")
+	}
+
+	return foundKey, nil
+}
+
+func (downloadManager *downloader) downloadToFile(key string) error {
+	file := filepath.Join(downloadManager.dir, key)
+
+	fs, err := os.Create(file)
+	if err != nil {
+		return err
+	}
+	defer fs.Close()
+
+	fmt.Printf("Downloading s3://%s/%s to %s...\n", downloadManager.bucket, key, file)
+	params := &s3.GetObjectInput{Bucket: &downloadManager.bucket, Key: &key}
+	if totalByte, err := downloadManager.Download(fs, params); err != nil {
+		fmt.Println(totalByte)
+		return err
+	}
+
+	return nil
+}
+
+//S3のインスタンスを取得する
+func getS3Instance() *s3.S3 {
+	defaults.DefaultConfig.Credentials = credentials.NewStaticCredentials(config.Aws.AccessKeyId, config.Aws.SecletAccessKey, "")
+	defaults.DefaultConfig.Region = &config.Aws.Region
+
+	return s3.New(nil)
 }

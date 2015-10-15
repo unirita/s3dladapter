@@ -30,8 +30,6 @@ const (
 	flag_OFF = false
 )
 
-const defaultConfig = `s3dladapter.ini`
-
 func main() {
 	args := fetchArgs()
 	rc := realMain(args)
@@ -44,38 +42,28 @@ func realMain(args *arguments) int {
 		return rc_OK
 	}
 
-	if args.versionFlag == flag_OFF && args.bucketName == "" && args.fileName == "" {
+	if args.configPath == "" || args.bucketName == "" || args.fileName == "" {
 		showUsage()
-		return rc_OK
-	}
-
-	if args.bucketName == "" || args.fileName == "" {
-		console.Display("ARG001E")
 		return rc_ERROR
 	}
 
-	if args.configPath == "" {
-		args.configPath = defaultConfig
-	}
-
 	if err := config.Load(args.configPath); err != nil {
-		console.Display("CON001E", err)
+		console.Display("ADP001E", err)
 		return rc_ERROR
 	}
 
 	if err := config.DetectError(); err != nil {
-		console.Display("CON002E", err)
+		console.Display("ADP002E", err)
 		return rc_ERROR
 	}
 
 	//設定ファイルを読み込んだ情報でS3に接続してダウンロード
 	if err := download.Download(args.bucketName, args.fileName); err != nil {
-		console.Display("DOW001E", err)
+		console.Display("ADP003E", err)
 		return rc_ERROR
 	}
 
-	rc := rc_OK
-	return rc
+	return rc_OK
 }
 
 // コマンドライン引数を解析し、arguments構造体を返す。

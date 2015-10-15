@@ -16,17 +16,15 @@ Option :
     -f downloadFile name :   Designate a file name.(Without extensions.)
     -c configFile Path   :   Designate configFile Path.
 	
-    -c default is same path as the executable file.
-    -b, -f, is a required input.
+    -b, -f, -c is a required input.
 Copyright 2015 unirita Inc.
 `
 
 // コンソールメッセージ一覧
 var msgs = map[string]string{
-	"ARG001E": "INVALID ARGUMENT.",
-	"CON001E": "FAILED TO READ CONFIG FILE.",
-	"CON002E": "CONFIG PARM IS NOT EXACT FORMAT.",
-	"DOW001E": "DOWNLOAD FAILED.",
+	"ADP001E": "FAILED TO READ CONFIG FILE.",
+	"ADP002E": "CONFIG PARM IS NOT EXACT FORMAT.",
+	"ADP003E": "DOWNLOAD FAILED.",
 }
 
 // 標準出力へメッセージコードcodeに対応したメッセージを表示する。
@@ -48,9 +46,6 @@ func Display(code string, a ...interface{}) (int, error) {
 //
 //
 // return : 取得したメッセージ
-//func GetMessage(code string) string {
-//	return fmt.Sprintf("%s", msgs[code])
-//}
 func GetMessage(code string, a ...interface{}) string {
 	return fmt.Sprintf("%s %s", code, fmt.Sprintf(msgs[code], a...))
 }

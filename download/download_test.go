@@ -6,30 +6,25 @@ import (
 	"s3dladapter/config"
 )
 
-func TestDownload_S3にダウンロードするファイルが存在する場合はエラーじゃない(t *testing.T) {
-	testConfig := `downloadtest.ini`
+func TestGetS3Instance_認証情報に該当するアカウントが存在する場合はインスタンスを返す(t *testing.T) {
+	testConfig := "existS3.ini"
 	if err := config.Load(testConfig); err != nil {
-		t.Error("テスト用のconfigが存在しない")
+		t.Errorf("テストファイルの読み込みに失敗")
 	}
 
-	testBucket := "testbucketuniritanewautomation"
-	testFile := "test1.txt"
-
-	if err := Download(testBucket, testFile); err != nil {
-		t.Errorf("想定外のエラーが発生した： %s", err)
+	if _, err := GetS3Instance(); err != nil {
+		t.Errorf("認証が通っていない")
 	}
+
 }
 
-func TestDownload_S3にダウンロードするファイルが存在しない場合はエラー(t *testing.T) {
-	testConfig := `downloadtest.ini`
+func TestGetS3Instance_認証情報に該当するアカウントが存在しない場合はエラー(t *testing.T) {
+	testConfig := "noexistS3.ini"
 	if err := config.Load(testConfig); err != nil {
-		t.Error("テスト用のconfigが存在しない")
+		t.Errorf("テストファイルの読み込みに失敗")
 	}
 
-	testBucket := "noexistBucket"
-	testFile := "noexistFile"
-
-	if err := Download(testBucket, testFile); err == nil {
-		t.Error("エラーが発生しなかった")
+	if _, err := GetS3Instance(); err == nil {
+		t.Errorf("期待していない認証が通っている")
 	}
 }

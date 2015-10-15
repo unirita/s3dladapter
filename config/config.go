@@ -9,8 +9,6 @@ import (
 	"os"
 
 	"github.com/BurntSushi/toml"
-
-	"s3dladapter/util"
 )
 
 type config struct {
@@ -75,9 +73,15 @@ func DetectError() error {
 		return fmt.Errorf("Aws.region value is not set.")
 	}
 
-	if util.PathExists(Download.DownloadDir) == false {
+	if !PathExists(Download.DownloadDir) {
 		return fmt.Errorf("Download.download_dir(%s) does not exist.", Download.DownloadDir)
 	}
 
 	return nil
+}
+
+//パスの存在チェック
+func PathExists(path string) bool {
+	_, err := os.Stat(path)
+	return err == nil
 }

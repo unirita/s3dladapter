@@ -13,18 +13,18 @@ func TestDisplay_メッセージを出力できる_引数なし(t *testing.T) {
 	c := testutil.NewStdoutCapturer()
 	c.Start()
 
-	Display("ARG001E")
+	Display("ADP001E")
 
 	output := c.Stop()
 
-	if output != "ARG001E INVALID ARGUMENT.\n" {
+	if output != "ADP001E FAILED TO READ CONFIG FILE.\n" {
 		t.Errorf("stdoutへの出力値[%s]が想定と違います。", output)
 	}
 }
 
 func TestGetMessage_メッセージを文字列として取得できる_引数なし(t *testing.T) {
-	msg := GetMessage("ARG001E")
-	if msg != "ARG001E INVALID ARGUMENT." {
+	msg := GetMessage("ADP001E")
+	if msg != "ADP001E FAILED TO READ CONFIG FILE." {
 		t.Errorf("取得値[%s]が想定と違います。", msg)
 	}
 }

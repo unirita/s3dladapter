@@ -61,7 +61,7 @@ func TestRealMain_引数に何も指定されなかった場合(t *testing.T) {
 	rc := realMain(args)
 	out := c.Stop()
 
-	if rc != rc_OK {
+	if rc != rc_ERROR {
 		t.Errorf("想定外のrc[%d]が返された。", rc)
 	}
 	if !strings.Contains(out, console.USAGE) {
@@ -83,7 +83,7 @@ func TestRealMain_引数がバケットのみの場合(t *testing.T) {
 	if rc != rc_ERROR {
 		t.Errorf("想定外のrc[%d]が返された。", rc)
 	}
-	if !strings.Contains(out, "INVALID ARGUMENT.") {
+	if !strings.Contains(out, console.USAGE) {
 		t.Error("出力内容が想定と違っている。")
 		t.Logf("出力: %s", out)
 	}
@@ -102,7 +102,26 @@ func TestRealMain_引数がダウンロードファイルのみの場合(t *test
 	if rc != rc_ERROR {
 		t.Errorf("想定外のrc[%d]が返された。", rc)
 	}
-	if !strings.Contains(out, "INVALID ARGUMENT.") {
+	if !strings.Contains(out, console.USAGE) {
+		t.Error("出力内容が想定と違っている。")
+		t.Logf("出力: %s", out)
+	}
+}
+
+func TestRealMain_引数が設定ファイルのみの場合(t *testing.T) {
+	c := testutil.NewStdoutCapturer()
+
+	args := new(arguments)
+	args.configPath = "testconfig.ini"
+
+	c.Start()
+	rc := realMain(args)
+	out := c.Stop()
+
+	if rc != rc_ERROR {
+		t.Errorf("想定外のrc[%d]が返された。", rc)
+	}
+	if !strings.Contains(out, console.USAGE) {
 		t.Error("出力内容が想定と違っている。")
 		t.Logf("出力: %s", out)
 	}
@@ -156,6 +175,7 @@ func TestRealMain_s3にダウンロードファイルが無い場合(t *testing.
 	args := new(arguments)
 	args.bucketName = "testbucket"
 	args.fileName = "testfile"
+	args.configPath = "s3dladapter.ini"
 
 	c.Start()
 	rc := realMain(args)
