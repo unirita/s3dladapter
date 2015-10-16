@@ -6,7 +6,7 @@ package console
 import (
 	"testing"
 
-	"s3dladapter/testutil"
+	"github.com/unirita/s3dladapter/testutil"
 )
 
 func TestDisplay_メッセージを出力できる(t *testing.T) {

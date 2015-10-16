@@ -15,7 +15,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 
-	"s3dladapter/config"
+	"github.com/unirita/s3dladapter/config"
 )
 
 //ダウンロードするオブジェクトの構造体

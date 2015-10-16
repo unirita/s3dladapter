@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"s3dladapter/console"
-	"s3dladapter/testutil"
+	"github.com/unirita/s3dladapter/console"
+	"github.com/unirita/s3dladapter/testutil"
 )
 
 var testDataDir string

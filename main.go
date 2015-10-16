@@ -6,9 +6,9 @@ import (
 	"os"
 	"strings"
 
-	"s3dladapter/config"
-	"s3dladapter/console"
-	"s3dladapter/download"
+	"github.com/unirita/s3dladapter/config"
+	"github.com/unirita/s3dladapter/console"
+	"github.com/unirita/s3dladapter/download"
 )
 
 // 実行時引数のオプション
