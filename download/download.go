@@ -26,6 +26,15 @@ type downloader struct {
 	dir    string
 }
 
+const (
+	logOff            = 0
+	logSigning        = 1
+	logHTTPBody       = 2
+	logRequestRetries = 3
+	logRequestErrors  = 4
+	logDebug          = 5
+)
+
 // S3からファイルをダウンロードする
 //
 // 引数: bucketName ダウンロード対象のファイルが入ったバケット名
@@ -106,17 +115,17 @@ func getS3Instance() *s3.S3 {
 
 	conf := aws.NewConfig()
 
-	if config.Log.LogLevel == 0 {
+	if config.Log.LogLevel == logOff {
 		conf.WithLogLevel(aws.LogOff)
-	} else if config.Log.LogLevel == 1 {
+	} else if config.Log.LogLevel == logSigning {
 		conf.WithLogLevel(aws.LogDebugWithSigning)
-	} else if config.Log.LogLevel == 2 {
+	} else if config.Log.LogLevel == logHTTPBody {
 		conf.WithLogLevel(aws.LogDebugWithHTTPBody)
-	} else if config.Log.LogLevel == 3 {
+	} else if config.Log.LogLevel == logRequestRetries {
 		conf.WithLogLevel(aws.LogDebugWithRequestRetries)
-	} else if config.Log.LogLevel == 4 {
+	} else if config.Log.LogLevel == logRequestErrors {
 		conf.WithLogLevel(aws.LogDebugWithRequestErrors)
-	} else if config.Log.LogLevel == 5 {
+	} else if config.Log.LogLevel == logDebug {
 		conf.WithLogLevel(aws.LogDebug)
 	}
 
