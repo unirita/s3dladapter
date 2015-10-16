@@ -44,7 +44,7 @@ func Download(bucketName string, fileName string) error {
 
 	manager := s3manager.NewDownloader(nil)
 	d := downloader{bucket: bucketName, file: fileName, dir: config.Download.DownloadDir, Downloader: manager}
-	if !existsDownloadFile(fileName, resp) {
+	if !exists(fileName, resp) {
 		return fmt.Errorf("Not exists download file.")
 	}
 
@@ -60,7 +60,7 @@ func Download(bucketName string, fileName string) error {
 // 引数: resp S3のキー名に部分一致したオブジェクト（複数）
 //
 // 戻り値： ダウンロードしたいファイルが存在するか　[存在する = true]
-func existsDownloadFile(downloadFile string, resp *s3.ListObjectsOutput) bool {
+func exists(downloadFile string, resp *s3.ListObjectsOutput) bool {
 	for _, content := range resp.Contents {
 		if *content.Key == downloadFile {
 			return true
