@@ -17,6 +17,11 @@ type config struct {
 	Log      logTable
 }
 
+const (
+	Log_Flag_ON  = "on"
+	Log_Flag_OFF = "off"
+)
+
 // 設定ファイルのawsテーブル
 type awsTable struct {
 	AccessKeyId     string `toml:"access_key_id"`
@@ -31,7 +36,11 @@ type downloadTable struct {
 
 // 設定ファイルのlogテーブル
 type logTable struct {
-	LogLevel int `toml:"loglevel"`
+	LogDebug          string `toml:"log_debug"`
+	LogSigning        string `toml:"log_signing"`
+	LogHTTPBody       string `toml:"log_loghttp"`
+	LogRequestRetries string `toml:"log_request_retries"`
+	LogRequestErrors  string `toml:"log_request_errors"`
 }
 
 var Aws = new(awsTable)
@@ -86,8 +95,24 @@ func DetectError() error {
 		return fmt.Errorf("Download.download_dir(%s) does not exist.", Download.DownloadDir)
 	}
 
-	if Log.LogLevel < 0 || Log.LogLevel > 5 {
-		return fmt.Errorf("Log.loglevel (%d) must to be range from 0 to 5", Log.LogLevel)
+	if Log.LogDebug != "on" || Log.LogDebug != "off" {
+		return fmt.Errorf("Log.log_debug (%s) does not have the format of on or off.", Log.LogDebug)
+	}
+
+	if Log.LogSigning != "on" || Log.LogSigning != "off" {
+		return fmt.Errorf("Log.log_signing (%s) does not have the format of on or off.", Log.LogSigning)
+	}
+
+	if Log.LogHTTPBody != "on" || Log.LogHTTPBody != "off" {
+		return fmt.Errorf("Log.log_httpbody (%s) does not have the format of on or off.", Log.LogHTTPBody)
+	}
+
+	if Log.LogRequestRetries != "on" || Log.LogRequestRetries != "off" {
+		return fmt.Errorf("Log.log_request_retries (%s) does not have the format of on or off.", Log.LogRequestRetries)
+	}
+
+	if Log.LogRequestErrors != "on" || Log.LogRequestErrors != "off" {
+		return fmt.Errorf("Log.log_request_errors (%s) does not have the format of on or off.", Log.LogRequestErrors)
 	}
 
 	return nil

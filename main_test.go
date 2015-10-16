@@ -33,6 +33,27 @@ func TestFetchArgs_コマンドラインオプションを取得できる(t *tes
 
 }
 
+func TestFetchArgs_コマンドラインオプションに値が指定されなかった場合(t *testing.T) {
+	os.Args = append(os.Args,　"-b")
+	args := fetchArgs()
+	
+	if args.versionFlag != flag_OFF {
+		t.Error("-vオプションの値が想定と異なっている。")
+	}
+	
+	if args.bucketName != "" {
+		t.Error("-bオプションの値が想定と異なっている。")
+	}
+
+	if args.fileName != "" {
+		t.Error("-fオプションの値が想定と異なっている。")
+	}
+
+	if args.configPath != "" {
+		t.Error("-cオプションの値が想定と異なっている。")
+	}
+}
+
 func TestRealMain_バージョン出力オプションが指定された場合(t *testing.T) {
 	c := testutil.NewStdoutCapturer()
 
@@ -53,24 +74,6 @@ func TestRealMain_バージョン出力オプションが指定された場合(t
 }
 
 func TestRealMain_引数に何も指定されなかった場合(t *testing.T) {
-	c := testutil.NewStdoutCapturer()
-
-	args := new(arguments)
-
-	c.Start()
-	rc := realMain(args)
-	out := c.Stop()
-
-	if rc != rc_ERROR {
-		t.Errorf("想定外のrc[%d]が返された。", rc)
-	}
-	if !strings.Contains(out, console.USAGE) {
-		t.Error("出力内容が想定と違っている。")
-		t.Logf("出力: %s", out)
-	}
-}
-
-func TestRealMain_オプションが指定されずに引数が渡された場合(t *testing.T) {
 	c := testutil.NewStdoutCapturer()
 
 	args := new(arguments)

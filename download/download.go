@@ -26,15 +26,6 @@ type downloader struct {
 	dir    string
 }
 
-const (
-	logOff            = 0
-	logSigning        = 1
-	logHTTPBody       = 2
-	logRequestRetries = 3
-	logRequestErrors  = 4
-	logDebug          = 5
-)
-
 // S3からファイルをダウンロードする
 //
 // 引数: bucketName ダウンロード対象のファイルが入ったバケット名
@@ -57,10 +48,12 @@ func Download(bucketName string, fileName string) error {
 		return fmt.Errorf("Not exists download file.")
 	}
 
-	if err := d.downlowdFile(fileName); err != nil {
+	if file, err := d.downlowdFile(fileName); err != nil {
+		if err := os.Remove(file); err != nil {
+			fmt.Println(err)
+		}
 		return err
 	}
-
 	return nil
 }
 
@@ -83,7 +76,7 @@ func exists(downloadFile string, resp *s3.ListObjectsOutput) bool {
 // 引数: ダウンロードするファイル名
 //
 // 戻り値： エラー情報
-func (d *downloader) downlowdFile(key string) error {
+func (d *downloader) downlowdFile(key string) (string, error) {
 	buffKeys := strings.Split(key, "/")
 
 	fileName := buffKeys[len(buffKeys)-1]
@@ -91,21 +84,18 @@ func (d *downloader) downlowdFile(key string) error {
 
 	fs, err := os.Create(file)
 	if err != nil {
-		return err
+		return file, err
 	}
 	defer fs.Close()
 
 	fmt.Printf("Downloading s3://%s/%s to %s...\n", d.bucket, fileName, file)
 	params := &s3.GetObjectInput{Bucket: &d.bucket, Key: &fileName}
 	if _, err := d.Download(fs, params); err != nil {
-		if err := os.Remove(file); err != nil {
-			return err
-		}
-		return err
+		return file, err
 	}
 
 	fmt.Printf("Complete download.")
-	return nil
+	return file, nil
 }
 
 //S3のインスタンスを取得する
@@ -113,21 +103,35 @@ func getS3Instance() *s3.S3 {
 	defaults.DefaultConfig.Credentials = credentials.NewStaticCredentials(config.Aws.AccessKeyId, config.Aws.SecletAccessKey, "")
 	defaults.DefaultConfig.Region = &config.Aws.Region
 
+	return s3.New(createConf())
+}
+
+func createConf() *aws.Config {
 	conf := aws.NewConfig()
 
-	if config.Log.LogLevel == logOff {
+	if config.Log.LogDebug == config.Log_Flag_OFF {
 		conf.WithLogLevel(aws.LogOff)
-	} else if config.Log.LogLevel == logSigning {
-		conf.WithLogLevel(aws.LogDebugWithSigning)
-	} else if config.Log.LogLevel == logHTTPBody {
-		conf.WithLogLevel(aws.LogDebugWithHTTPBody)
-	} else if config.Log.LogLevel == logRequestRetries {
-		conf.WithLogLevel(aws.LogDebugWithRequestRetries)
-	} else if config.Log.LogLevel == logRequestErrors {
-		conf.WithLogLevel(aws.LogDebugWithRequestErrors)
-	} else if config.Log.LogLevel == logDebug {
-		conf.WithLogLevel(aws.LogDebug)
-	}
+	} else {
 
-	return s3.New(conf)
+		loglevel := aws.LogDebug
+
+		if config.Log.LogSigning == config.Log_Flag_ON {
+			loglevel |= aws.LogDebugWithSigning
+		}
+
+		if config.Log.LogHTTPBody == config.Log_Flag_ON {
+			loglevel |= aws.LogDebugWithHTTPBody
+		}
+
+		if config.Log.LogRequestRetries == config.Log_Flag_ON {
+			loglevel |= aws.LogDebugWithRequestRetries
+		}
+
+		if config.Log.LogRequestErrors == config.Log_Flag_ON {
+			loglevel |= aws.LogDebugWithRequestErrors
+		}
+
+		conf.WithLogLevel(loglevel)
+	}
+	return conf
 }

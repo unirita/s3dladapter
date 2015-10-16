@@ -10,7 +10,11 @@ func generateTestConfig() {
 	Aws.SecletAccessKey = `seclettestkey`
 	Aws.Region = `ap-northeast-1`
 	Download.DownloadDir = `c:\TEST`
-	Log.LogLevel = 5
+	Log.LogDebug = `off`
+	Log.LogSigning = `off`
+	Log.LogHTTPBody = `off`
+	Log.LogRequestRetries = `off`
+	Log.LogRequestErrors = `off`
 }
 
 func TestLoad_存在しないファイルをロードしようとした場合はエラー(t *testing.T) {
@@ -28,7 +32,11 @@ region='ap-northeast-1'
 [download]
 download_dir='c:\TEST'
 [log]
-loglevel=5
+log_debug='off'
+log_signing='off'
+log_httpbody='off'
+log_request_retries='off'
+log_request_errors='off'
 `
 
 	r := strings.NewReader(conf)
@@ -61,7 +69,11 @@ region='ap-northeast-1'
 [download]
 download_dir='c:\TEST'
 [log]
-loglevel=5
+log_debug='off'
+log_signing='off'
+log_httpbody='off'
+log_request_retries='off'
+log_request_errors='off'
 `
 
 	r := strings.NewReader(conf)
@@ -111,44 +123,13 @@ func TestDetectError_ダウンロード保存先パスが存在しなかった�
 	}
 }
 
-func TestDetectError_loglevelの値が最大(t *testing.T) {
+func TestDetectError_ログレベルのlog_debug値が不正(t *testing.T) {
 	generateTestConfig()
-	Log.LogLevel = 5
-	if err := DetectError(); err != nil {
-		t.Errorf("期待していないエラーが発生した")
-	}
 
-	if Log.LogLevel != 5 {
-		t.Errorf("loglevelに正しい値が入っていない[%d]", Log.LogLevel)
-	}
-}
+	Log.LogDebug = "No"
 
-func TestDetectError_範囲外の数値の場合はエラー_最大越え(t *testing.T) {
-	generateTestConfig()
-	Log.LogLevel = 6
 	if err := DetectError(); err == nil {
-		t.Errorf("エラーが発生しなかった。")
-	}
-
-}
-
-func TestDetectError_loglevelの値が最小(t *testing.T) {
-	generateTestConfig()
-	Log.LogLevel = 0
-	if err := DetectError(); err != nil {
-		t.Errorf("期待していないエラーが発生した")
-	}
-
-	if Log.LogLevel != 0 {
-		t.Errorf("loglevelに正しい値が入っていない[%d]", Log.LogLevel)
-	}
-}
-
-func TestDetectError_範囲外の数値の場合はエラー_マイナス(t *testing.T) {
-	generateTestConfig()
-	Log.LogLevel = -1
-	if err := DetectError(); err == nil {
-		t.Errorf("エラーが発生しなかった。")
+		t.Error("エラーが発生しなかった。")
 	}
 
 }
