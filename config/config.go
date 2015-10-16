@@ -82,7 +82,7 @@ func DetectError() error {
 		return fmt.Errorf("Aws.region value is not set.")
 	}
 
-	if !pathExists(Download.DownloadDir) {
+	if !existsDir(Download.DownloadDir) {
 		return fmt.Errorf("Download.download_dir(%s) does not exist.", Download.DownloadDir)
 	}
 
@@ -94,7 +94,7 @@ func DetectError() error {
 }
 
 //パスの存在チェック
-func pathExists(path string) bool {
+func existsDir(path string) bool {
 	_, err := os.Stat(path)
 	return err == nil
 }

@@ -157,11 +157,11 @@ func TestpathExists_ローカルパスの存在確認(t *testing.T) {
 	nonExistPath := "C:\\HOGEHOGEAAABBB"
 	existPath := "C:\\"
 
-	if pathExists(existPath) == false {
+	if existsDir(existPath) == false {
 		t.Errorf("パスのチェックが間違っています")
 	}
 
-	if pathExists(nonExistPath) == true {
+	if existsDir(nonExistPath) == true {
 		t.Errorf("パスのチェックが間違っています")
 	}
 }
