@@ -70,6 +70,84 @@ func TestRealMain_引数に何も指定されなかった場合(t *testing.T) {
 	}
 }
 
+func TestRealMain_オプションが指定されずに引数が渡された場合(t *testing.T) {
+	c := testutil.NewStdoutCapturer()
+
+	args := new(arguments)
+
+	c.Start()
+	rc := realMain(args)
+	out := c.Stop()
+
+	if rc != rc_ERROR {
+		t.Errorf("想定外のrc[%d]が返された。", rc)
+	}
+	if !strings.Contains(out, console.USAGE) {
+		t.Error("出力内容が想定と違っている。")
+		t.Logf("出力: %s", out)
+	}
+}
+
+func TestRealMain_引数にバケット名が指定されていない場合(t *testing.T) {
+	c := testutil.NewStdoutCapturer()
+
+	args := new(arguments)
+	args.fileName = "file.txt"
+	args.configPath = "config.ini"
+
+	c.Start()
+	rc := realMain(args)
+	out := c.Stop()
+
+	if rc != rc_ERROR {
+		t.Errorf("想定外のrc[%d]が返された。", rc)
+	}
+	if !strings.Contains(out, console.USAGE) {
+		t.Error("出力内容が想定と違っている。")
+		t.Logf("出力: %s", out)
+	}
+}
+
+func TestRealMain_引数にファイル名が指定されていない場合(t *testing.T) {
+	c := testutil.NewStdoutCapturer()
+
+	args := new(arguments)
+	args.bucketName = "bucket"
+	args.configPath = "config.ini"
+
+	c.Start()
+	rc := realMain(args)
+	out := c.Stop()
+
+	if rc != rc_ERROR {
+		t.Errorf("想定外のrc[%d]が返された。", rc)
+	}
+	if !strings.Contains(out, console.USAGE) {
+		t.Error("出力内容が想定と違っている。")
+		t.Logf("出力: %s", out)
+	}
+}
+
+func TestRealMain_引数に設定ファイルのパスが指定されていない場合(t *testing.T) {
+	c := testutil.NewStdoutCapturer()
+
+	args := new(arguments)
+	args.bucketName = "bucket"
+	args.fileName = "file.txt"
+
+	c.Start()
+	rc := realMain(args)
+	out := c.Stop()
+
+	if rc != rc_ERROR {
+		t.Errorf("想定外のrc[%d]が返された。", rc)
+	}
+	if !strings.Contains(out, console.USAGE) {
+		t.Error("出力内容が想定と違っている。")
+		t.Logf("出力: %s", out)
+	}
+}
+
 func TestRealMain_引数がバケットのみの場合(t *testing.T) {
 	c := testutil.NewStdoutCapturer()
 
@@ -127,11 +205,13 @@ func TestRealMain_引数が設定ファイルのみの場合(t *testing.T) {
 	}
 }
 
-func TestRealMain_引数がディレクトリが指定された場合(t *testing.T) {
+func TestRealMain_引数にディレクトリが指定された場合(t *testing.T) {
 	c := testutil.NewStdoutCapturer()
 
 	args := new(arguments)
+	args.bucketName = "bucket"
 	args.fileName = "test/"
+	args.configPath = "config.ini"
 
 	c.Start()
 	rc := realMain(args)
