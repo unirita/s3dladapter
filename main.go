@@ -15,7 +15,7 @@ import (
 type arguments struct {
 	versionFlag bool   // バージョン情報表示フラグ
 	bucketName  string //バケット名
-	fileName    string //S3からダウンロードするファイル名
+	keyName     string //S3からダウンロードするキー名
 	configPath  string //設定ファイルのパス
 }
 
@@ -43,12 +43,12 @@ func realMain(args *arguments) int {
 		return rc_OK
 	}
 
-	if args.configPath == "" || args.bucketName == "" || args.fileName == "" {
+	if args.configPath == "" || args.bucketName == "" || args.keyName == "" {
 		showUsage()
 		return rc_ERROR
 	}
 
-	if strings.HasSuffix(args.fileName, "/") {
+	if strings.HasSuffix(args.keyName, "/") {
 		console.Display("ADP001E")
 		return rc_ERROR
 	}
@@ -64,7 +64,7 @@ func realMain(args *arguments) int {
 	}
 
 	//設定ファイルを読み込んだ情報でS3に接続してダウンロード
-	if err := download.Download(args.bucketName, args.fileName); err != nil {
+	if err := download.Download(args.bucketName, args.keyName); err != nil {
 		console.Display("ADP004E", err)
 		return rc_ERROR
 	}
@@ -78,7 +78,7 @@ func fetchArgs() *arguments {
 	flag.Usage = showUsage
 	flag.BoolVar(&args.versionFlag, "v", false, "version option")
 	flag.StringVar(&args.bucketName, "b", "", "Designate bucket option")
-	flag.StringVar(&args.fileName, "f", "", "Designate download file option")
+	flag.StringVar(&args.keyName, "k", "", "Designate download key option")
 	flag.StringVar(&args.configPath, "c", "", "Designate config file option")
 	flag.Parse()
 

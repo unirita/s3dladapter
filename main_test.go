@@ -16,7 +16,7 @@ var testDataDir string
 func TestFetchArgs_コマンドラインオプションを取得できる(t *testing.T) {
 	flag.CommandLine = flag.NewFlagSet(os.Args[0], flag.PanicOnError)
 	os.Args = os.Args[:1]
-	os.Args = append(os.Args, "-v", "-b", "bucket", "-f", "file", "-c", "test.ini")
+	os.Args = append(os.Args, "-v", "-b", "bucket", "-k", "file", "-c", "test.ini")
 	args := fetchArgs()
 
 	if args.versionFlag != flag_ON {
@@ -27,7 +27,7 @@ func TestFetchArgs_コマンドラインオプションを取得できる(t *tes
 		t.Error("-bオプションの指定を検出できなかった。")
 	}
 
-	if args.fileName != "file" {
+	if args.keyName != "file" {
 		t.Error("-fオプションの指定を検出できなかった。")
 	}
 
@@ -50,7 +50,7 @@ func TestFetchArgs_コマンドラインオプションに値が指定されな�
 		t.Error("-bオプションの値が想定と異なっている。")
 	}
 
-	if args.fileName != "" {
+	if args.keyName != "" {
 		t.Error("-fオプションの値が想定と異なっている。")
 	}
 
@@ -100,7 +100,7 @@ func TestRealMain_引数にバケット名が指定されていない場合(t *t
 	c := testutil.NewStdoutCapturer()
 
 	args := new(arguments)
-	args.fileName = "file.txt"
+	args.keyName = "file.txt"
 	args.configPath = "config.ini"
 
 	c.Start()
@@ -141,7 +141,7 @@ func TestRealMain_引数に設定ファイルのパスが指定されていな�
 
 	args := new(arguments)
 	args.bucketName = "bucket"
-	args.fileName = "file.txt"
+	args.keyName = "file.txt"
 
 	c.Start()
 	rc := realMain(args)
@@ -179,7 +179,7 @@ func TestRealMain_引数がダウンロードファイルのみの場合(t *test
 	c := testutil.NewStdoutCapturer()
 
 	args := new(arguments)
-	args.fileName = "file"
+	args.keyName = "file"
 
 	c.Start()
 	rc := realMain(args)
@@ -218,7 +218,7 @@ func TestRealMain_引数にディレクトリが指定された場合(t *testing
 
 	args := new(arguments)
 	args.bucketName = "bucket"
-	args.fileName = "test/"
+	args.keyName = "test/"
 	args.configPath = "config.ini"
 
 	c.Start()
@@ -239,7 +239,7 @@ func TestRealMain_存在しない設定ファイルが指定された場合(t *t
 
 	args := new(arguments)
 	args.bucketName = "testbucket"
-	args.fileName = "testfile"
+	args.keyName = "testfile"
 	args.configPath = "noexistsconf.ini"
 
 	c.Start()
@@ -260,7 +260,7 @@ func TestRealMain_不正な内容の設定ファイルが指定された場合(t
 
 	args := new(arguments)
 	args.bucketName = "testbucket"
-	args.fileName = "testfile"
+	args.keyName = "testfile"
 	if runtime.GOOS == "windows" {
 		args.configPath = "test\\configerror.ini"
 	} else if runtime.GOOS == "linux" {
@@ -286,7 +286,7 @@ func _TestRealMain_s3にダウンロード処理に失敗した場合(t *testing
 
 	args := new(arguments)
 	args.bucketName = "testbucket"
-	args.fileName = "testfile"
+	args.keyName = "testfile"
 	if runtime.GOOS == "windows" {
 		args.configPath = "test\\noexists3.ini"
 	} else if runtime.GOOS == "linux" {

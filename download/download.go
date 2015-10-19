@@ -29,26 +29,26 @@ type downloader struct {
 // S3からファイルをダウンロードする
 //
 // 引数: bucketName ダウンロード対象のファイルが入ったバケット名
-//      fileName ダウンロード対象のファイル
+//      key        ダウンロード対象のキー名
 //
 // 戻り値： エラー情報
-func Download(bucketName string, fileName string) error {
+func Download(bucketName string, key string) error {
 	//設定ファイルの情報を与えてS3のインスタンスを作成する
 	client := getS3Instance()
 
-	params := &s3.ListObjectsInput{Bucket: &bucketName, Prefix: &fileName}
+	params := &s3.ListObjectsInput{Bucket: &bucketName, Prefix: &key}
 	resp, connectErr := client.ListObjects(params)
 	if connectErr != nil {
 		return connectErr
 	}
 
 	manager := s3manager.NewDownloader(nil)
-	d := downloader{bucket: bucketName, file: fileName, dir: config.Download.DownloadDir, Downloader: manager}
-	if !exists(fileName, resp) {
+	d := downloader{bucket: bucketName, file: key, dir: config.Download.DownloadDir, Downloader: manager}
+	if !exists(key, resp) {
 		return fmt.Errorf("Not exists download file.")
 	}
 
-	if file, err := d.downlowdFile(fileName); err != nil {
+	if file, err := d.downlowdFile(key); err != nil {
 		if err := os.Remove(file); err != nil {
 			fmt.Println(err)
 		}
@@ -73,7 +73,7 @@ func exists(downloadFile string, resp *s3.ListObjectsOutput) bool {
 
 // ファイルをダウンロードする。
 //
-// 引数: ダウンロードするファイル名
+// 引数: ダウンロードするキー名
 //
 // 戻り値： エラー情報
 func (d *downloader) downlowdFile(key string) (string, error) {

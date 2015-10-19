@@ -9,14 +9,14 @@ import (
 
 // USAGE表示用の定義メッセージ
 const USAGE = `Usage :
-    s3dladapter.exe [-v] [-b Bucket] [-f File] [-c configPath]
+    s3dladapter.exe [-v] [-b Bucket] [-k Key] [-c configPath]
 Option :
     -v                   :   Print s3dladapter version.
     -b bucket name       :   Designate a buket name.
-    -f downloadFile name :   Designate a file name.(Without extensions.)
+    -k key name          :   Designate a key name.
     -c configFile Path   :   Designate configFile Path.
 	
-    -b, -f, -c is a required input.
+    -b, -k, -c is a required input.
 Copyright 2015 unirita Inc.
 `
 
