@@ -81,6 +81,7 @@ func fetchArgs() *arguments {
 	flag.StringVar(&args.fileName, "f", "", "Designate download file option")
 	flag.StringVar(&args.configPath, "c", "", "Designate config file option")
 	flag.Parse()
+
 	return args
 }
 

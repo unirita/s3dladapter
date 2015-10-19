@@ -18,8 +18,8 @@ type config struct {
 }
 
 const (
-	Log_Flag_ON  = "on"
-	Log_Flag_OFF = "off"
+	Log_Flag_ON  = 1
+	Log_Flag_OFF = 0
 )
 
 // 設定ファイルのawsテーブル
@@ -36,11 +36,11 @@ type downloadTable struct {
 
 // 設定ファイルのlogテーブル
 type logTable struct {
-	LogDebug          string `toml:"log_debug"`
-	LogSigning        string `toml:"log_signing"`
-	LogHTTPBody       string `toml:"log_loghttp"`
-	LogRequestRetries string `toml:"log_request_retries"`
-	LogRequestErrors  string `toml:"log_request_errors"`
+	LogDebug          int `toml:"log_on"`
+	LogSigning        int `toml:"signing_on"`
+	LogHTTPBody       int `toml:"httpbody_on"`
+	LogRequestRetries int `toml:"request_retries_on"`
+	LogRequestErrors  int `toml:"request_errors_on"`
 }
 
 var Aws = new(awsTable)
@@ -95,24 +95,24 @@ func DetectError() error {
 		return fmt.Errorf("Download.download_dir(%s) does not exist.", Download.DownloadDir)
 	}
 
-	if Log.LogDebug != "on" || Log.LogDebug != "off" {
-		return fmt.Errorf("Log.log_debug (%s) does not have the format of on or off.", Log.LogDebug)
+	if Log.LogDebug != Log_Flag_ON && Log.LogDebug != Log_Flag_OFF {
+		return fmt.Errorf("Log.log_debug (%d) must be a 1 or 0.", Log.LogDebug)
 	}
 
-	if Log.LogSigning != "on" || Log.LogSigning != "off" {
-		return fmt.Errorf("Log.log_signing (%s) does not have the format of on or off.", Log.LogSigning)
+	if Log.LogSigning != Log_Flag_ON && Log.LogSigning != Log_Flag_OFF {
+		return fmt.Errorf("Log.log_signing (%d) must be a 1 or 0.", Log.LogSigning)
 	}
 
-	if Log.LogHTTPBody != "on" || Log.LogHTTPBody != "off" {
-		return fmt.Errorf("Log.log_httpbody (%s) does not have the format of on or off.", Log.LogHTTPBody)
+	if Log.LogHTTPBody != Log_Flag_ON && Log.LogHTTPBody != Log_Flag_OFF {
+		return fmt.Errorf("Log.log_httpbody (%d) must be a 1 or 0.", Log.LogHTTPBody)
 	}
 
-	if Log.LogRequestRetries != "on" || Log.LogRequestRetries != "off" {
-		return fmt.Errorf("Log.log_request_retries (%s) does not have the format of on or off.", Log.LogRequestRetries)
+	if Log.LogRequestRetries != Log_Flag_ON && Log.LogRequestRetries != Log_Flag_OFF {
+		return fmt.Errorf("Log.log_request_retries (%d) must be a 1 or 0.", Log.LogRequestRetries)
 	}
 
-	if Log.LogRequestErrors != "on" || Log.LogRequestErrors != "off" {
-		return fmt.Errorf("Log.log_request_errors (%s) does not have the format of on or off.", Log.LogRequestErrors)
+	if Log.LogRequestErrors != Log_Flag_ON && Log.LogRequestErrors != Log_Flag_OFF {
+		return fmt.Errorf("Log.log_request_errors (%d) must be a 1 or 0.", Log.LogRequestErrors)
 	}
 
 	return nil
