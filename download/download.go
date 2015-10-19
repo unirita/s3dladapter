@@ -88,8 +88,8 @@ func (d *downloader) downlowdFile(key string) (string, error) {
 	}
 	defer fs.Close()
 
-	fmt.Printf("Downloading s3://%s/%s to %s...\n", d.bucket, fileName, file)
-	params := &s3.GetObjectInput{Bucket: &d.bucket, Key: &fileName}
+	fmt.Printf("Downloading s3://%s/%s to %s...\n", d.bucket, key, file)
+	params := &s3.GetObjectInput{Bucket: &d.bucket, Key: &key}
 	if _, err := d.Download(fs, params); err != nil {
 		return file, err
 	}
