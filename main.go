@@ -49,23 +49,23 @@ func realMain(args *arguments) int {
 	}
 
 	if strings.HasSuffix(args.keyName, "/") {
-		console.Display("ADP001E")
+		console.Display("DLA001E")
 		return rc_ERROR
 	}
 
 	if err := config.Load(args.configPath); err != nil {
-		console.Display("ADP002E", err)
+		console.Display("DLA002E", err)
 		return rc_ERROR
 	}
 
 	if err := config.DetectError(); err != nil {
-		console.Display("ADP003E", err)
+		console.Display("DLA003E", err)
 		return rc_ERROR
 	}
 
 	//設定ファイルを読み込んだ情報でS3に接続してダウンロード
 	if err := download.Download(args.bucketName, args.keyName); err != nil {
-		console.Display("ADP004E", err)
+		console.Display("DLA004E", err)
 		return rc_ERROR
 	}
 
