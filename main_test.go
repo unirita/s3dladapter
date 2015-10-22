@@ -28,7 +28,7 @@ func TestFetchArgs_コマンドラインオプションを取得できる(t *tes
 	}
 
 	if args.keyName != "file" {
-		t.Error("-fオプションの指定を検出できなかった。")
+		t.Error("-kオプションの指定を検出できなかった。")
 	}
 
 	if args.configPath != "test.ini" {
@@ -51,7 +51,7 @@ func TestFetchArgs_コマンドラインオプションに値が指定されな�
 	}
 
 	if args.keyName != "" {
-		t.Error("-fオプションの値が想定と異なっている。")
+		t.Error("-kオプションの値が想定と異なっている。")
 	}
 
 	if args.configPath != "" {

@@ -94,7 +94,8 @@ func (d *downloader) downlowdFile(key string) (string, error) {
 		return file, err
 	}
 
-	fmt.Printf("Complete download.")
+	fmt.Println("Complete download.")
+	fmt.Println(file)
 	return file, nil
 }
 
