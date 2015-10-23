@@ -26,13 +26,8 @@ func Do(bucket string, key string) error {
 	//設定ファイルの情報を与えてS3のインスタンスを作成する
 	client := s3.New(createConf())
 
-	params := &s3.ListObjectsInput{Bucket: &bucket, Prefix: &key}
-	resp, connectErr := client.ListObjects(params)
-	if connectErr != nil {
-		return connectErr
-	}
-	if !exists(key, resp) {
-		return fmt.Errorf("Not exists download file.")
+	if err := tryToFindFile(client, bucket, key); err != nil {
+		return err
 	}
 
 	if localPath, err := downlowdFile(bucket, key, config.Download.DownloadDir); err != nil {
@@ -41,6 +36,19 @@ func Do(bucket string, key string) error {
 		}
 		return err
 	}
+	return nil
+}
+
+func tryToFindFile(client *s3.S3, bucket, key string) error {
+	params := &s3.ListObjectsInput{Bucket: &bucket, Prefix: &key}
+	resp, err := client.ListObjects(params)
+	if err != nil {
+		return err
+	}
+	if !exists(key, resp) {
+		return fmt.Errorf("Not exists download file.")
+	}
+
 	return nil
 }
 
