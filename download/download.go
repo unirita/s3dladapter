@@ -23,10 +23,7 @@ import (
 //
 // 戻り値： エラー情報
 func Do(bucket string, key string) error {
-	//設定ファイルの情報を与えてS3のインスタンスを作成する
-	client := s3.New(createConf())
-
-	if err := tryToFindFile(client, bucket, key); err != nil {
+	if err := tryToFindFile(bucket, key); err != nil {
 		return err
 	}
 
@@ -42,7 +39,8 @@ func Do(bucket string, key string) error {
 	return nil
 }
 
-func tryToFindFile(client *s3.S3, bucket, key string) error {
+func tryToFindFile(bucket, key string) error {
+	client := s3.New(createConf())
 	params := &s3.ListObjectsInput{Bucket: &bucket, Prefix: &key}
 	objectList, err := client.ListObjects(params)
 	if err != nil {
