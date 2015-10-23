@@ -22,11 +22,11 @@ import (
 //      key        ダウンロード対象のキー名
 //
 // 戻り値： エラー情報
-func Do(bucketName string, key string) error {
+func Do(bucket string, key string) error {
 	//設定ファイルの情報を与えてS3のインスタンスを作成する
 	client := s3.New(createConf())
 
-	params := &s3.ListObjectsInput{Bucket: &bucketName, Prefix: &key}
+	params := &s3.ListObjectsInput{Bucket: &bucket, Prefix: &key}
 	resp, connectErr := client.ListObjects(params)
 	if connectErr != nil {
 		return connectErr
@@ -35,7 +35,7 @@ func Do(bucketName string, key string) error {
 		return fmt.Errorf("Not exists download file.")
 	}
 
-	if localPath, err := downlowdFile(bucketName, key, config.Download.DownloadDir); err != nil {
+	if localPath, err := downlowdFile(bucket, key, config.Download.DownloadDir); err != nil {
 		if err := os.Remove(localPath); err != nil {
 			fmt.Println(err)
 		}
@@ -67,24 +67,24 @@ func downlowdFile(bucket, key, localDir string) (string, error) {
 	buffKeys := strings.Split(key, "/")
 
 	fileName := buffKeys[len(buffKeys)-1]
-	file := filepath.Join(localDir, fileName)
+	localPath := filepath.Join(localDir, fileName)
 
-	fs, err := os.Create(file)
+	file, err := os.Create(localPath)
 	if err != nil {
-		return file, err
+		return localPath, err
 	}
-	defer fs.Close()
+	defer file.Close()
 
-	fmt.Printf("Downloading s3://%s/%s to %s...\n", bucket, key, file)
+	fmt.Printf("Downloading s3://%s/%s to %s...\n", bucket, key, localPath)
 	d := s3manager.NewDownloader(nil)
 	params := &s3.GetObjectInput{Bucket: &bucket, Key: &key}
-	if _, err := d.Download(fs, params); err != nil {
-		return file, err
+	if _, err := d.Download(file, params); err != nil {
+		return localPath, err
 	}
 
 	fmt.Println("Complete download.")
-	fmt.Println(file)
-	return file, nil
+	fmt.Println(localPath)
+	return localPath, nil
 }
 
 func createConf() *aws.Config {
