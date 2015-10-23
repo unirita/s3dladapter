@@ -39,13 +39,12 @@ func Do(bucketName string, key string) error {
 	if connectErr != nil {
 		return connectErr
 	}
-
-	manager := s3manager.NewDownloader(nil)
-	d := downloader{bucket: bucketName, file: key, dir: config.Download.DownloadDir, Downloader: manager}
 	if !exists(key, resp) {
 		return fmt.Errorf("Not exists download file.")
 	}
 
+	manager := s3manager.NewDownloader(nil)
+	d := downloader{bucket: bucketName, file: key, dir: config.Download.DownloadDir, Downloader: manager}
 	if file, err := d.downlowdFile(key); err != nil {
 		if err := os.Remove(file); err != nil {
 			fmt.Println(err)
