@@ -30,7 +30,8 @@ func Do(bucket string, key string) error {
 		return err
 	}
 
-	if localPath, err := downlowdFile(bucket, key, config.Download.DownloadDir); err != nil {
+	localPath, err := downlowdFile(bucket, key, config.Download.DownloadDir)
+	if err != nil {
 		if err := os.Remove(localPath); err != nil {
 			fmt.Println(err)
 		}
