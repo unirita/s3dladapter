@@ -4,7 +4,7 @@ import (
 	"errors"
 	"flag"
 	"os"
-	"runtime"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -277,11 +277,7 @@ func TestRealMain_不正な内容の設定ファイルが指定された場合(t
 	args := new(arguments)
 	args.bucketName = "testbucket"
 	args.keyName = "testfile"
-	if runtime.GOOS == "windows" {
-		args.configPath = "test\\configerror.ini"
-	} else if runtime.GOOS == "linux" {
-		args.configPath = "./test/configerror.ini"
-	}
+	args.configPath = filepath.Join("testdata", "error.ini")
 
 	c.Start()
 	rc := realMain(args)
