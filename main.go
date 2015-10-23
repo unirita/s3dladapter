@@ -31,6 +31,10 @@ const (
 	flag_OFF = false
 )
 
+type downloadFunc func(string, string) error
+
+var doDownload downloadFunc = download.Do
+
 func main() {
 	args := fetchArgs()
 	rc := realMain(args)
@@ -64,7 +68,7 @@ func realMain(args *arguments) int {
 	}
 
 	//設定ファイルを読み込んだ情報でS3に接続してダウンロード
-	if err := download.Download(args.bucketName, args.keyName); err != nil {
+	if err := download.Do(args.bucketName, args.keyName); err != nil {
 		console.Display("DLA004E", err)
 		return rc_ERROR
 	}

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"os"
 	"runtime"
@@ -8,10 +9,25 @@ import (
 	"testing"
 
 	"github.com/unirita/s3dladapter/console"
+	"github.com/unirita/s3dladapter/download"
 	"github.com/unirita/s3dladapter/testutil"
 )
 
-var testDataDir string
+func makeDownloadSuccess() {
+	doDownload = func(bucket string, key string) error {
+		return nil
+	}
+}
+
+func makeDownloadFail() {
+	doDownload = func(bucket string, key string) error {
+		return errors.New("error")
+	}
+}
+
+func restoreDownloadFunc() {
+	doDownload = download.Do
+}
 
 func TestFetchArgs_コマンドラインオプションを取得できる(t *testing.T) {
 	flag.CommandLine = flag.NewFlagSet(os.Args[0], flag.PanicOnError)

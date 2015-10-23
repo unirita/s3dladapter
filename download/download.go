@@ -32,7 +32,7 @@ type downloader struct {
 //      key        ダウンロード対象のキー名
 //
 // 戻り値： エラー情報
-func Download(bucketName string, key string) error {
+func Do(bucketName string, key string) error {
 	//設定ファイルの情報を与えてS3のインスタンスを作成する
 	client := getS3Instance()
 
