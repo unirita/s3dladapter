@@ -16,14 +16,6 @@ import (
 	"github.com/unirita/s3dladapter/config"
 )
 
-//ダウンロードするオブジェクトの構造体
-type downloader struct {
-	*s3manager.Downloader
-	bucket string
-	file   string
-	dir    string
-}
-
 // S3からファイルをダウンロードする
 //
 // 引数: bucketName ダウンロード対象のファイルが入ったバケット名
@@ -43,10 +35,8 @@ func Do(bucketName string, key string) error {
 		return fmt.Errorf("Not exists download file.")
 	}
 
-	manager := s3manager.NewDownloader(nil)
-	d := downloader{bucket: bucketName, file: key, dir: config.Download.DownloadDir, Downloader: manager}
-	if file, err := d.downlowdFile(key); err != nil {
-		if err := os.Remove(file); err != nil {
+	if localPath, err := downlowdFile(bucketName, key, config.Download.DownloadDir); err != nil {
+		if err := os.Remove(localPath); err != nil {
 			fmt.Println(err)
 		}
 		return err
@@ -73,11 +63,11 @@ func exists(downloadFile string, resp *s3.ListObjectsOutput) bool {
 // 引数: ダウンロードするキー名
 //
 // 戻り値： エラー情報
-func (d *downloader) downlowdFile(key string) (string, error) {
+func downlowdFile(bucket, key, localDir string) (string, error) {
 	buffKeys := strings.Split(key, "/")
 
 	fileName := buffKeys[len(buffKeys)-1]
-	file := filepath.Join(d.dir, fileName)
+	file := filepath.Join(localDir, fileName)
 
 	fs, err := os.Create(file)
 	if err != nil {
@@ -85,8 +75,9 @@ func (d *downloader) downlowdFile(key string) (string, error) {
 	}
 	defer fs.Close()
 
-	fmt.Printf("Downloading s3://%s/%s to %s...\n", d.bucket, key, file)
-	params := &s3.GetObjectInput{Bucket: &d.bucket, Key: &key}
+	fmt.Printf("Downloading s3://%s/%s to %s...\n", bucket, key, file)
+	d := s3manager.NewDownloader(nil)
+	params := &s3.GetObjectInput{Bucket: &bucket, Key: &key}
 	if _, err := d.Download(fs, params); err != nil {
 		return file, err
 	}
