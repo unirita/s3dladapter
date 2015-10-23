@@ -8,6 +8,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/aws/aws-sdk-go/aws/defaults"
+
 	"github.com/unirita/s3dladapter/console"
 	"github.com/unirita/s3dladapter/download"
 	"github.com/unirita/s3dladapter/testutil"
@@ -328,5 +330,21 @@ func TestRealMain_正常系(t *testing.T) {
 
 	if rc != rc_OK {
 		t.Errorf("想定外のrc[%d]が返された。", rc)
+	}
+
+	credentialValue, err := defaults.DefaultConfig.Credentials.Get()
+	if err != nil {
+		t.Fatalf("クレデンシャル情報の取得に失敗した: %s", err)
+	}
+	if credentialValue.AccessKeyID != "testaccesskey" {
+		t.Errorf("アクセスキーIDの設定値[%s]が想定と違う。", credentialValue.AccessKeyID)
+	}
+	if credentialValue.SecretAccessKey != "testsecretkey" {
+		t.Errorf("シークレットアクセスキーの設定値[%s]が想定と違う。", credentialValue.SecretAccessKey)
+	}
+
+	region := defaults.DefaultConfig.Region
+	if *region != "testregion" {
+		t.Errorf("リージョン名の設定値[%s]が想定と違う。", *region)
 	}
 }

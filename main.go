@@ -6,6 +6,9 @@ import (
 	"os"
 	"strings"
 
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/defaults"
+
 	"github.com/unirita/s3dladapter/config"
 	"github.com/unirita/s3dladapter/console"
 	"github.com/unirita/s3dladapter/download"
@@ -66,6 +69,9 @@ func realMain(args *arguments) int {
 		console.Display("DLA003E", err)
 		return rc_ERROR
 	}
+
+	defaults.DefaultConfig.Credentials = credentials.NewStaticCredentials(config.Aws.AccessKeyId, config.Aws.SecletAccessKey, "")
+	defaults.DefaultConfig.Region = &config.Aws.Region
 
 	//設定ファイルを読み込んだ情報でS3に接続してダウンロード
 	if err := doDownload(args.bucketName, args.keyName); err != nil {

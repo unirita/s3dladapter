@@ -10,8 +10,6 @@ import (
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/defaults"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 
@@ -34,7 +32,7 @@ type downloader struct {
 // 戻り値： エラー情報
 func Do(bucketName string, key string) error {
 	//設定ファイルの情報を与えてS3のインスタンスを作成する
-	client := getS3Instance()
+	client := s3.New(createConf())
 
 	params := &s3.ListObjectsInput{Bucket: &bucketName, Prefix: &key}
 	resp, connectErr := client.ListObjects(params)
@@ -97,14 +95,6 @@ func (d *downloader) downlowdFile(key string) (string, error) {
 	fmt.Println("Complete download.")
 	fmt.Println(file)
 	return file, nil
-}
-
-//S3のインスタンスを取得する
-func getS3Instance() *s3.S3 {
-	defaults.DefaultConfig.Credentials = credentials.NewStaticCredentials(config.Aws.AccessKeyId, config.Aws.SecletAccessKey, "")
-	defaults.DefaultConfig.Region = &config.Aws.Region
-
-	return s3.New(createConf())
 }
 
 func createConf() *aws.Config {
