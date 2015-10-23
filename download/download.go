@@ -42,11 +42,11 @@ func Do(bucket string, key string) error {
 
 func tryToFindFile(client *s3.S3, bucket, key string) error {
 	params := &s3.ListObjectsInput{Bucket: &bucket, Prefix: &key}
-	resp, err := client.ListObjects(params)
+	objectList, err := client.ListObjects(params)
 	if err != nil {
 		return err
 	}
-	if !exists(key, resp) {
+	if !exists(objectList, key) {
 		return fmt.Errorf("Not exists download file.")
 	}
 
@@ -58,8 +58,8 @@ func tryToFindFile(client *s3.S3, bucket, key string) error {
 // 引数: resp S3のキー名に部分一致したオブジェクト（複数）
 //
 // 戻り値： ダウンロードしたいファイルが存在するか　[存在する = true]
-func exists(downloadFile string, resp *s3.ListObjectsOutput) bool {
-	for _, content := range resp.Contents {
+func exists(objectList *s3.ListObjectsOutput, downloadFile string) bool {
+	for _, content := range objectList.Contents {
 		if *content.Key == downloadFile {
 			return true
 		}
