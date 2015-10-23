@@ -6,8 +6,8 @@ package download
 import (
 	"fmt"
 	"os"
+	"path"
 	"path/filepath"
-	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -64,9 +64,7 @@ func exists(downloadFile string, resp *s3.ListObjectsOutput) bool {
 //
 // 戻り値： エラー情報
 func downlowdFile(bucket, key, localDir string) (string, error) {
-	buffKeys := strings.Split(key, "/")
-
-	fileName := buffKeys[len(buffKeys)-1]
+	fileName := path.Base(key)
 	localPath := filepath.Join(localDir, fileName)
 
 	file, err := os.Create(localPath)
