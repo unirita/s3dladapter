@@ -37,6 +37,8 @@ func Do(bucket string, key string) error {
 		}
 		return err
 	}
+
+	fmt.Println(localPath)
 	return nil
 }
 
@@ -89,8 +91,7 @@ func downlowdFile(bucket, key, localDir string) (string, error) {
 		return localPath, err
 	}
 
-	fmt.Println("Complete download.")
-	fmt.Println(localPath)
+	fmt.Println("Download complete .")
 	return localPath, nil
 }
 
