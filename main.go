@@ -68,7 +68,7 @@ func realMain(args *arguments) int {
 	}
 
 	//設定ファイルを読み込んだ情報でS3に接続してダウンロード
-	if err := download.Do(args.bucketName, args.keyName); err != nil {
+	if err := doDownload(args.bucketName, args.keyName); err != nil {
 		console.Display("DLA004E", err)
 		return rc_ERROR
 	}
